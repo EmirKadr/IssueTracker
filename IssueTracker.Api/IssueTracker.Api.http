@@ -4,3 +4,15 @@ GET {{IssueTracker.Api_HostAddress}}/api/tickets
 Accept: application/json
 
 ###
+
+POST {{IssueTracker.Api_HostAddress}}/api/tickets
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Kan inte logga in",
+  "description": "Användaren kan inte logga in i systemet.",
+  "priority": "High"
+}
+
+###

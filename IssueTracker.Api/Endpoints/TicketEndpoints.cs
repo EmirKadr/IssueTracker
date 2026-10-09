@@ -1,6 +1,8 @@
 using Dapper;
 using IssueTracker.Api.Dtos;
 using IssueTracker.Api.Models;
+using IssueTracker.Api.Services;
+using IssueTracker.Api.Validators;
 using Microsoft.Data.SqlClient;
 
 namespace IssueTracker.Api.Endpoints;
@@ -30,6 +32,39 @@ public static class TicketEndpoints
             return Results.Ok(ticketDtos);
         });
 
+        app.MapPost("/api/tickets", (CreateTicketRequest request) =>
+        {
+            var errors = TicketValidator.ValidateTicket(request);
+
+            if (errors.Count > 0)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            var service = new TicketService(
+                app.Configuration.GetConnectionString("Prod")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+
+            var ticket = service.CreateTicket(
+                request.Title!,
+                request.Description!,
+                request.Priority!);
+
+            var ticketDto = new TicketDto
+            {
+                Id = ticket.Id,
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Status = ticket.Status,
+                Priority = ticket.Priority
+            };
+
+            return Results.Created($"/api/tickets/{ticket.Id}", ticketDto);
+        });
+
         return app;
     }
+
 }
+
+
