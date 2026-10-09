@@ -1,0 +1,6 @@
+@IssueTracker.Api_HostAddress = https://localhost:9000
+
+GET {{IssueTracker.Api_HostAddress}}/api/tickets
+Accept: application/json
+
+###
