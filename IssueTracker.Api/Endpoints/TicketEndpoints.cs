@@ -62,6 +62,19 @@ public static class TicketEndpoints
             return Results.Created($"/api/tickets/{ticket.Id}", ticketDto);
         });
 
+        app.MapDelete("/api/tickets/{id:int}", (int id) =>
+        {
+            using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+            connection.Open();
+
+            var rows = connection.Execute(
+                "DELETE FROM dbo.Tickets WHERE Id = @Id;",
+                new { Id = id });
+
+            return rows == 0 ? Results.NotFound() : Results.NoContent();
+        });
+
         return app;
     }
 

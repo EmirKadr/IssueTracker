@@ -1,4 +1,5 @@
 @IssueTracker.Api_HostAddress = https://localhost:9000
+@ticketId = 1
 
 GET {{IssueTracker.Api_HostAddress}}/api/tickets
 Accept: application/json
@@ -14,5 +15,10 @@ Accept: application/json
   "description": "Användaren kan inte logga in i systemet.",
   "priority": "High"
 }
+
+###
+
+# Ange ID för ett testärende ovan. Anropet raderar ärendet.
+DELETE {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
 
 ###
