@@ -1,12 +1,11 @@
-var builder = WebApplication.CreateBuilder(args);
+using IssueTracker.Api.Endpoints;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
 
+app.MapTicketEndpoints();
 
 app.Run();
