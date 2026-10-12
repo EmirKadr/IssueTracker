@@ -61,3 +61,102 @@ Content-Type: application/json
 }
 
 ###
+
+# Ändra endast status. Förväntat: 204.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/status",
+    "value": "InProgress"
+  }
+]
+
+###
+
+# Ändra flera fält. Förväntat: 204.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/status",
+    "value": "Closed"
+  },
+  {
+    "op": "replace",
+    "path": "/priority",
+    "value": "Low"
+  }
+]
+
+###
+
+# Ogiltiga värden. Förväntat: 400.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/status",
+    "value": "Fel"
+  },
+  {
+    "op": "replace",
+    "path": "/title",
+    "value": "Hej"
+  }
+]
+
+###
+
+# Ogiltig sökväg. Förväntat: 400. Inget ska sparas.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/priority",
+    "value": "High"
+  },
+  {
+    "op": "replace",
+    "path": "/saknas",
+    "value": "Fel"
+  }
+]
+
+###
+
+# Ogiltig operation. Förväntat: 400.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "invalid",
+    "path": "/status",
+    "value": "Closed"
+  }
+]
+
+###
+
+# Saknat ärende. Förväntat: 404.
+PATCH {{IssueTracker.Api_HostAddress}}/api/tickets/0
+Content-Type: application/json-patch+json
+
+[
+  {
+    "op": "replace",
+    "path": "/status",
+    "value": "Closed"
+  }
+]
+
+###

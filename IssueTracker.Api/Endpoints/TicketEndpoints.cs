@@ -4,6 +4,7 @@ using IssueTracker.Api.Models;
 using IssueTracker.Api.Services;
 using IssueTracker.Api.Validators;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 
 namespace IssueTracker.Api.Endpoints;
 
@@ -76,6 +77,46 @@ public static class TicketEndpoints
 
             var rows = service.UpdateTicket(id, request.Title!, request.Description!, request.Status!, request.Priority!);
 
+            return rows == 0 ? Results.NotFound() : Results.NoContent();
+        });
+
+        app.MapPatch("/api/tickets/{id:int}", (int id, JsonPatchDocument<UpdateTicketRequest> patch) =>
+        {
+            var service = new TicketService(
+                app.Configuration.GetConnectionString("Prod")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+
+            var ticket = service.GetTicket(id);
+            if (ticket is null)
+            {
+                return Results.NotFound();
+            }
+
+            var request = new UpdateTicketRequest
+            {
+                Title = ticket.Title,
+                Description = ticket.Description,
+                Status = ticket.Status,
+                Priority = ticket.Priority
+            };
+
+            var patchErrors = new List<string>();
+            patch.ApplyTo(request, error => patchErrors.Add(error.ErrorMessage));
+            if (patchErrors.Count > 0)
+            {
+                return Results.ValidationProblem(new Dictionary<string, string[]>
+                {
+                    ["Patch"] = patchErrors.ToArray()
+                });
+            }
+
+            var errors = TicketValidator.ValidateTicket(request);
+            if (errors.Count > 0)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            var rows = service.UpdateTicket(id, request.Title!, request.Description!, request.Status!, request.Priority!);
             return rows == 0 ? Results.NotFound() : Results.NoContent();
         });
 

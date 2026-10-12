@@ -8,22 +8,21 @@ namespace IssueTracker.Api.Services;
 
 public class TicketService
 {
-    //public int UpdateProperty(int id, UpdatePropertyRequest request)
-    //{
-    //    using var connection = new SqlConnection(_connectionString);
-    //    connection.Open();
-    //    return connection.Execute(@"
-    //    UPDATE dbo.Properties
-    //    SET Name = @Name, Address = @Address, Floors = @Floors, PortCode = @PortCode
-    //    WHERE PropertyID = @Id;",
-    //        new { Id = id, request.Name, request.Address, request.Floors, request.PortCode });
-    //}
-
     private readonly string _connectionString;
 
     public TicketService(string connectionString)
     {
         _connectionString = connectionString;
+    }
+
+    public Tickets? GetTicket(int id)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        connection.Open();
+
+        return connection.QuerySingleOrDefault<Tickets>(
+            "SELECT Id, Title, Description, Status, Priority FROM dbo.Tickets WHERE Id = @Id;",
+            new { Id = id });
     }
 
     public int UpdateTicket(int id, string title, string description, string status, string priority)
