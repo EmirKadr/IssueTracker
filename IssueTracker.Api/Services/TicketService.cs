@@ -26,6 +26,18 @@ public class TicketService
         _connectionString = connectionString;
     }
 
+    public int UpdateTicket(int id, string title, string description, string status, string priority)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        connection.Open();
+
+        return connection.Execute(@"
+            UPDATE dbo.Tickets
+            SET Title = @Title, Description = @Description, Status = @Status, Priority = @Priority
+            WHERE Id = @Id;",
+            new { Id = id, Title = title, Description = description, Status = status, Priority = priority });
+    }
+
     public Tickets CreateTicket(string title, string description, string priority)
     {
         using var connection = new SqlConnection(_connectionString);

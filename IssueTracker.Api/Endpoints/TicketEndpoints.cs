@@ -62,6 +62,23 @@ public static class TicketEndpoints
             return Results.Created($"/api/tickets/{ticket.Id}", ticketDto);
         });
 
+        app.MapPut("/api/tickets/{id:int}", (int id, UpdateTicketRequest request) =>
+        {
+            var errors = TicketValidator.ValidateTicket(request);
+            if (errors.Count > 0)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            var service = new TicketService(
+                app.Configuration.GetConnectionString("Prod")
+                ?? throw new InvalidOperationException("Anslutningssträngen 'Prod' saknas."));
+
+            var rows = service.UpdateTicket(id, request.Title!, request.Description!, request.Status!, request.Priority!);
+
+            return rows == 0 ? Results.NotFound() : Results.NoContent();
+        });
+
         app.MapDelete("/api/tickets/{id:int}", (int id) =>
         {
             using var connection = new SqlConnection(app.Configuration.GetConnectionString("Prod")

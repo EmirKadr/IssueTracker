@@ -22,3 +22,42 @@ Accept: application/json
 DELETE {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
 
 ###
+
+# Ange ID för ett befintligt testärende i ticketId. Förväntat: 204.
+PUT {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json
+
+{
+  "title": "Problem med inloggning",
+  "description": "Inloggningen fungerar igen efter lösenordsbyte.",
+  "status": "Closed",
+  "priority": "Normal"
+}
+
+###
+
+# Förväntat: 400 med fyra valideringsfel.
+PUT {{IssueTracker.Api_HostAddress}}/api/tickets/{{ticketId}}
+Content-Type: application/json
+
+{
+  "title": "Hej",
+  "description": "Kort",
+  "status": "Fel",
+  "priority": "Fel"
+}
+
+###
+
+# Förväntat: 404 eftersom automatiskt genererade ID börjar på 1.
+PUT {{IssueTracker.Api_HostAddress}}/api/tickets/0
+Content-Type: application/json
+
+{
+  "title": "Problem med inloggning",
+  "description": "Inloggningen fungerar igen efter lösenordsbyte.",
+  "status": "Closed",
+  "priority": "Normal"
+}
+
+###

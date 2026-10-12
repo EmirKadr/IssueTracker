@@ -20,6 +20,23 @@ namespace IssueTracker.Api.Validators;
         //    return errors;
         //}
 
+        public static Dictionary<string, string[]> ValidateTicket(UpdateTicketRequest request)
+        {
+            var errors = ValidateTicket(new CreateTicketRequest
+            {
+                Title = request.Title,
+                Description = request.Description,
+                Priority = request.Priority
+            });
+
+            if (request.Status != "Open" && request.Status != "InProgress" && request.Status != "Closed")
+            {
+                errors["Status"] = ["Status får endast vara 'Open', 'InProgress' eller 'Closed'."];
+            }
+
+            return errors;
+        }
+
         public static Dictionary<string, string[]> ValidateTicket(
             CreateTicketRequest request)
         {
